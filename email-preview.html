@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Idearupt — All Email Previews</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; background: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; }
+  .nav { position: sticky; top: 0; z-index: 100; background: #09090b; border-bottom: 1px solid #27272a; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .nav-title { font-size: 18px; font-weight: 700; color: #8B5CF6; margin-right: 16px; }
+  .nav a { font-size: 13px; padding: 6px 14px; border-radius: 6px; text-decoration: none; color: #a1a1aa; border: 1px solid #27272a; transition: all 0.2s; }
+  .nav a:hover { color: #f4f4f5; border-color: #8B5CF6; background: rgba(139,92,246,0.1); }
+  .nav a.lifecycle { border-color: #7C3AED; color: #c4b5fd; }
+  .nav a.daily { border-color: #06B6D4; color: #67e8f9; }
+  .section { padding: 32px 16px; max-width: 700px; margin: 0 auto; }
+  .label { display: inline-block; margin: 40px 0 12px; padding: 8px 16px; font-size: 14px; font-weight: 700; border-radius: 8px; }
+  .label-lifecycle { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid #7C3AED; }
+  .label-daily { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid #06B6D4; }
+  .label-alert { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid #10b981; }
+  .meta { font-size: 13px; color: #71717a; margin: 0 0 8px; line-height: 1.6; }
+  .email-frame { border: 1px solid #27272a; border-radius: 12px; overflow: hidden; margin: 0 0 20px; }
+  .email-frame iframe { width: 100%; height: 700px; border: none; background: #09090b; }
+  hr.sep { border: none; border-top: 1px solid #27272a; margin: 60px 0 20px; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="nav-title">Email Previews</span>
+  <a href="#welcome" class="lifecycle">1. Welcome</a>
+  <a href="#day3" class="lifecycle">2. Day 3</a>
+  <a href="#day5" class="lifecycle">3. Day 5</a>
+  <a href="#day7" class="lifecycle">4. Day 7</a>
+  <a href="#day10" class="lifecycle">5. Day 10</a>
+  <a href="#morning" class="daily">6. Daily Morning</a>
+  <a href="#saved" class="daily">7. Saved Alert</a>
+</div>
+
+<div class="section">
+
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="welcome"></div>
+<span class="label label-lifecycle">EMAIL 1 — WELCOME (Day 0, on signup)</span>
+<p class="meta">
+  <strong>Subject:</strong> Welcome to Idearupt — your 7-day Pro trial is live!<br>
+  <strong>Trigger:</strong> Instant on signup (send-welcome-email function)<br>
+  <strong>CTA:</strong> "See Today's Top Problems →"<br>
+  <strong>Price link:</strong> None — no checkout link in this email
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Welcome to Idearupt</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f4f4f5;line-height:1.3;">Welcome, Bhavesh &#128075;</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your <strong style="color:#f4f4f5;">7-day Pro trial</strong> is now active. Here&apos;s what you can do every day:</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0c1a0e;border:1px solid #166534;border-radius:10px;margin:0 0 24px;">
+            <tr><td style="padding:20px;">
+              <p style="margin:0 0 10px;font-size:14px;color:#4ade80;">&#10003; 8 idea views per day</p>
+              <p style="margin:0 0 10px;font-size:14px;color:#4ade80;">&#10003; 8 signals &amp; use cases per day</p>
+              <p style="margin:0 0 10px;font-size:14px;color:#4ade80;">&#10003; 5 saves per day</p>
+              <p style="margin:0 0 10px;font-size:14px;color:#4ade80;">&#10003; 3 blueprints, validations &amp; competitor analyses</p>
+              <p style="margin:0 0 10px;font-size:14px;color:#4ade80;">&#10003; 2 deep dives &amp; remixes</p>
+              <p style="margin:0 0 0;font-size:14px;color:#4ade80;">&#10003; Full competitor details, revenue projections &amp; quotes</p>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 8px;font-size:13px;color:#71717a;text-align:center;">No credit card required.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">See Today&apos;s Top Problems &rarr;</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:24px 32px;">
+          <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#71717a;">I&apos;m Bhavesh &#8212; I built a $1.5M agency starting from zero at 18. Idearupt is the tool I wish I had when I was looking for my first problem to solve.</p>
+          <p style="margin:0;font-size:13px;line-height:1.6;color:#71717a;">Hit reply &#8212; I read every single one.</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#71717a;">&#8212; Bhavesh</p>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&copy; 2026 Idearupt &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up at idearupt.ai</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="day3"></div>
+<span class="label label-lifecycle">EMAIL 2 — DAY 3 CHECK-IN (daysUntilEnd = 4)</span>
+<p class="meta">
+  <strong>Subject:</strong> You&apos;ve got 4 days left on your Pro trial<br>
+  <strong>Trigger:</strong> Cron every 6h, fires when trial_ends_at is 4 days away<br>
+  <strong>CTA:</strong> "Explore Idearupt →" + green promo box "Upgrade now →"<br>
+  <strong>Price link:</strong> $19/mo only (Lemon Squeezy checkout)
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Idearupt</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f4f4f5;">4 days left on Pro</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hey Bhavesh, you&apos;re halfway through your 7-day Pro trial. Have you tried everything yet?</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1e1b2e;border:1px solid #2e2a45;border-radius:10px;margin:0 0 20px;">
+            <tr><td style="padding:20px;">
+              <p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#d4d4d8;">&bull; <strong style="color:#f4f4f5;">Build Blueprint</strong> &mdash; a week-by-week launch plan for any idea</p>
+              <p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#d4d4d8;">&bull; <strong style="color:#f4f4f5;">Competitor Analysis</strong> &mdash; see who else is building in the space, their revenue, and real user quotes</p>
+              <p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#d4d4d8;">&bull; <strong style="color:#f4f4f5;">Deep Dive</strong> &mdash; AI-powered market deep dive on any problem</p>
+              <p style="margin:0 0 0;font-size:14px;line-height:1.5;color:#d4d4d8;">&bull; <strong style="color:#f4f4f5;">Validate your own idea</strong> &mdash; paste any problem and get an instant AI score with feedback</p>
+            </td></tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">Explore Idearupt &rarr;</a>
+            </td></tr>
+          </table>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0c1a0e;border:1px solid #166534;border-radius:8px;margin:0 0 20px;">
+            <tr><td style="padding:16px 20px;">
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#4ade80;">&#128640; <strong>Loving it?</strong> Keep Pro for <strong>$19/mo</strong> before your trial ends. <a href="#" style="color:#8B5CF6;font-weight:600;text-decoration:none;">Upgrade now &rarr;</a></p>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&copy; 2026 Idearupt &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up at idearupt.ai</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="day5"></div>
+<span class="label label-lifecycle">EMAIL 3 — DAY 5 WARNING (daysUntilEnd = 2)</span>
+<p class="meta">
+  <strong>Subject:</strong> 2 days left on your Idearupt Pro trial<br>
+  <strong>Trigger:</strong> Cron every 6h, fires when trial_ends_at is 2 days away<br>
+  <strong>CTA:</strong> "Keep Pro for $19/mo →"<br>
+  <strong>Price link:</strong> $19/mo only
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Idearupt</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f4f4f5;">Your Pro access expires in 48 hours</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hey Bhavesh, your Pro trial ends in <strong style="color:#f4f4f5;">2 days</strong>. Here&apos;s what drops:</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1c1111;border:1px solid #7f1d1d;border-radius:10px;margin:0 0 20px;">
+            <tr><td style="padding:20px;">
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Idea views: <strong style="color:#f4f4f5;">8 &rarr; 3</strong> per day</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Blueprints: <strong style="color:#f4f4f5;">3 &rarr; 1</strong> per day</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Validations: <strong style="color:#f4f4f5;">3 &rarr; 1</strong> per day</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Deep dives: <strong style="color:#f4f4f5;">2 &rarr; 1</strong> per day</p>
+              <p style="margin:0 0 0;font-size:14px;color:#fca5a5;">&#10007; Competitor details &amp; revenue projections: <strong style="color:#f4f4f5;">locked</strong></p>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Don&apos;t wait until it&apos;s too late.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">Keep Pro for $19/mo &rarr;</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&copy; 2026 Idearupt &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up at idearupt.ai</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="day7"></div>
+<span class="label label-lifecycle">EMAIL 4 — DAY 7 EXPIRED (daysUntilEnd = 0)</span>
+<p class="meta">
+  <strong>Subject:</strong> Your 7-day Pro trial just ended<br>
+  <strong>Trigger:</strong> Cron every 6h, fires on trial expiry day. Also sets subscription_status = &apos;free&apos;<br>
+  <strong>CTA:</strong> "Get Pro for $19/mo →"<br>
+  <strong>Price link:</strong> $19/mo only
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Idearupt</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f4f4f5;">Your trial has ended</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hey Bhavesh, your 7-day Pro trial is over. Here&apos;s what changed:</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1c1111;border:1px solid #7f1d1d;border-radius:10px;margin:0 0 20px;">
+            <tr><td style="padding:20px;">
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Idea views: <strong style="color:#f4f4f5;">3 per day</strong> (was 8)</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Blueprints: <strong style="color:#f4f4f5;">1 per day</strong> (was 3)</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Validations: <strong style="color:#f4f4f5;">1 per day</strong> (was 3)</p>
+              <p style="margin:0 0 8px;font-size:14px;color:#fca5a5;">&#10007; Deep dives: <strong style="color:#f4f4f5;">1 per day</strong> (was 2)</p>
+              <p style="margin:0 0 0;font-size:14px;color:#fca5a5;">&#10007; Competitor details &amp; revenue projections: <strong style="color:#f4f4f5;">locked</strong></p>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your saved ideas and blueprints are still here &mdash; but locked behind Pro.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">Get Pro for $19/mo &rarr;</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&copy; 2026 Idearupt &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up at idearupt.ai</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="day10"></div>
+<span class="label label-lifecycle">EMAIL 5 — DAY 10 NUDGE (daysSinceEnd = 3)</span>
+<p class="meta">
+  <strong>Subject:</strong> You explored dozens of problems during your trial — don&apos;t lose access<br>
+  <strong>Trigger:</strong> Cron every 6h, fires 3 days after trial expired. Final lifecycle email.<br>
+  <strong>CTA:</strong> "Upgrade to Pro — $19/mo →" + secondary "See what you&apos;re missing"<br>
+  <strong>Price link:</strong> $19/mo only
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Idearupt</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#f4f4f5;">Don&apos;t lose what you built</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hey Bhavesh, you explored dozens of validated problems during your trial.</p>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;"><strong style="color:#f4f4f5;">New high-scoring problems dropped this week</strong> that match your Builder DNA.</p>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your saved ideas and blueprints are still here &mdash; but locked behind Pro.</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">Upgrade to Pro &mdash; $19/mo &rarr;</a>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 20px;text-align:center;">
+            <a href="#" style="font-size:14px;color:#8B5CF6;text-decoration:underline;">See what you&apos;re missing</a>
+          </p>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&copy; 2026 Idearupt &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up at idearupt.ai</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="morning"></div>
+<span class="label label-daily">EMAIL 6 — DAILY MORNING (8 AM UTC, every day, forever)</span>
+<p class="meta">
+  <strong>Subject:</strong> &#128293; Today&apos;s Top Problem: {title} — Score {score}<br>
+  <strong>Trigger:</strong> Daily at 8 AM UTC, to ALL users<br>
+  <strong>CTA:</strong> "Explore This Idea →" per card + "See All Today&apos;s Problems →"<br>
+  <strong>Price link:</strong> $19/mo upgrade box (free users only, hidden for Pro)
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Todays Top Problems</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+          <span style="float:right;font-size:11px;color:rgba(255,255,255,0.7);line-height:30px;">Daily Briefing</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <p style="margin:0 0 6px;font-size:15px;color:#a1a1aa;">Good morning Bhavesh,</p>
+          <h1 style="margin:0 0 20px;font-size:22px;font-weight:700;color:#f4f4f5;line-height:1.3;">Here are today&apos;s highest-scored problems people are begging someone to solve:</h1>
+
+          <!-- Idea Card 1 (featured) -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1e1b2e;border:1px solid #2e2a45;border-radius:10px;margin:0 0 16px;">
+            <tr><td style="padding:20px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+                <td>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#A78BFA;background:#A78BFA18;border:1px solid #A78BFA40;border-radius:6px;padding:3px 8px;">AI/ML</span>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#F59E0B;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:3px 8px;margin-left:6px;">Pain: 8.5</span>
+                </td>
+                <td align="right">
+                  <span style="display:inline-block;width:36px;height:36px;line-height:36px;text-align:center;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:#fff;font-size:13px;font-weight:700;">8</span>
+                </td>
+              </tr></table>
+              <h2 style="margin:12px 0 6px;font-size:18px;font-weight:700;color:#f4f4f5;line-height:1.3;">AI Code Review Fatigue Solver</h2>
+              <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa;">Developers are overwhelmed with AI-generated code suggestions flooding their PR reviews. A tool that filters signal from noise.</p>
+              <p style="margin:0 0 14px;font-size:11px;color:#71717a;">Score: 8.2 &middot; 14 people complaining</p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+                  <a href="#" style="display:inline-block;padding:10px 24px;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;">Explore This Idea &rarr;</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <!-- Idea Card 2 -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a1f;border:1px solid #27272a;border-radius:10px;margin:0 0 16px;">
+            <tr><td style="padding:20px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+                <td>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#22D3EE;background:#22D3EE18;border:1px solid #22D3EE40;border-radius:6px;padding:3px 8px;">Developer Tools</span>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#F59E0B;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:3px 8px;margin-left:6px;">Pain: 7.8</span>
+                </td>
+                <td align="right">
+                  <span style="display:inline-block;width:36px;height:36px;line-height:36px;text-align:center;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:#fff;font-size:13px;font-weight:700;">7</span>
+                </td>
+              </tr></table>
+              <h2 style="margin:12px 0 6px;font-size:16px;font-weight:700;color:#f4f4f5;line-height:1.3;">CI/CD Pipeline Cost Monitor</h2>
+              <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa;">Teams spending $1K+/mo on CI/CD without knowing which pipelines waste the most money.</p>
+              <p style="margin:0 0 14px;font-size:11px;color:#71717a;">Score: 7.4 &middot; 8 people complaining</p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr><td style="background:#27272a;border-radius:8px;">
+                  <a href="#" style="display:inline-block;padding:10px 24px;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;">Explore &rarr;</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <!-- Idea Card 3 -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a1f;border:1px solid #27272a;border-radius:10px;margin:0 0 16px;">
+            <tr><td style="padding:20px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+                <td>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#FBBF24;background:#FBBF2418;border:1px solid #FBBF2440;border-radius:6px;padding:3px 8px;">Marketing</span>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#F59E0B;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:3px 8px;margin-left:6px;">Pain: 7.2</span>
+                </td>
+                <td align="right">
+                  <span style="display:inline-block;width:36px;height:36px;line-height:36px;text-align:center;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#06B6D4);color:#fff;font-size:13px;font-weight:700;">7</span>
+                </td>
+              </tr></table>
+              <h2 style="margin:12px 0 6px;font-size:16px;font-weight:700;color:#f4f4f5;line-height:1.3;">SEO Content Decay Tracker</h2>
+              <p style="margin:0 0 12px;font-size:13px;line-height:1.5;color:#a1a1aa;">Marketers losing traffic because old blog posts decay without anyone noticing until it&apos;s too late.</p>
+              <p style="margin:0 0 14px;font-size:11px;color:#71717a;">Score: 7.1</p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr><td style="background:#27272a;border-radius:8px;">
+                  <a href="#" style="display:inline-block;padding:10px 24px;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;">Explore &rarr;</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <p style="margin:0 0 16px;font-size:14px;color:#71717a;text-align:center;">+5 more problems dropped today</p>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:14px 36px;color:#ffffff;font-size:16px;font-weight:600;text-decoration:none;">See All Today&apos;s Problems &rarr;</a>
+            </td></tr>
+          </table>
+
+          <!-- Upgrade box (free users only) -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0c1a0e;border:1px solid #166534;border-radius:8px;margin:0 0 20px;">
+            <tr><td style="padding:16px 20px;">
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#4ade80;">&#128275; <strong>Free users see 3 ideas/day.</strong> Unlock everything for <strong>$19/mo</strong>. <a href="#" style="color:#8B5CF6;font-weight:600;text-decoration:none;">Upgrade to Pro &rarr;</a></p>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&mdash; Bhavesh, Founder of Idearupt</p>
+          <p style="margin:0 0 4px;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up for Idearupt.</p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;"><a href="#" style="color:#8B5CF6;text-decoration:underline;">Unsubscribe</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<div id="saved"></div>
+<span class="label label-alert">EMAIL 7 — SAVED IDEA ALERT (6 PM UTC, daily, if applicable)</span>
+<p class="meta">
+  <strong>Subject:</strong> &#128200; An idea you saved just got hotter — {title} is trending<br>
+  <strong>Trigger:</strong> Daily at 6 PM UTC, only to users whose saved ideas were updated in the last 24h<br>
+  <strong>CTA:</strong> "Check Updated Insights →" per card + "See All Your Saved Ideas →"<br>
+  <strong>Price link:</strong> None
+</p>
+<div class="email-frame">
+<iframe srcdoc='<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Saved Idea Alert</title></head>
+<body style="margin:0;padding:0;background-color:#09090b;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#09090b;">
+    <tr><td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background-color:#18181b;border-radius:12px;overflow:hidden;border:1px solid #27272a;">
+        <tr><td style="background:linear-gradient(135deg,#8B5CF6,#7C3AED);padding:28px 32px;">
+          <span style="font-size:22px;font-weight:700;color:#ffffff;">Idea</span><span style="font-size:22px;font-weight:700;color:#e0d4ff;">rupt</span>
+          <span style="float:right;font-size:11px;color:rgba(255,255,255,0.7);line-height:30px;">Saved Idea Alert</span>
+        </td></tr>
+        <tr><td style="padding:32px 32px 24px;">
+          <p style="margin:0 0 6px;font-size:15px;color:#a1a1aa;">Hey Bhavesh,</p>
+          <h1 style="margin:0 0 20px;font-size:20px;font-weight:700;color:#f4f4f5;line-height:1.3;">An idea you saved is getting more traction:</h1>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1e1b2e;border:1px solid #2e2a45;border-radius:10px;margin:0 0 16px;">
+            <tr><td style="padding:20px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+                <td>
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#22D3EE;background:#22D3EE18;border:1px solid #22D3EE40;border-radius:6px;padding:3px 8px;">Productivity</span>
+                </td>
+                <td align="right">
+                  <span style="display:inline-block;font-size:11px;font-weight:600;color:#34D399;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:6px;padding:3px 8px;">&#128200; Updated</span>
+                </td>
+              </tr></table>
+              <h2 style="margin:12px 0 6px;font-size:16px;font-weight:700;color:#f4f4f5;line-height:1.3;">Meeting Notes Auto-Organizer</h2>
+              <p style="margin:0 0 10px;font-size:13px;line-height:1.5;color:#a1a1aa;">People are frustrated that meeting notes from Zoom/Teams end up scattered across Notion, Slack, and email with no way to search them.</p>
+              <p style="margin:0 0 14px;font-size:11px;color:#71717a;">Score: 7.8 &middot; Pain: 8.1 &middot; 42 builders viewed this</p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr><td style="background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:8px;">
+                  <a href="#" style="display:inline-block;padding:10px 24px;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;">Check Updated Insights &rarr;</a>
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+            <tr><td style="background:#27272a;border:1px solid #3f3f46;border-radius:8px;">
+              <a href="#" style="display:inline-block;padding:12px 28px;color:#f4f4f5;font-size:14px;font-weight:600;text-decoration:none;">See All Your Saved Ideas &rarr;</a>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:0 32px;"><div style="border-top:1px solid #27272a;"></div></td></tr>
+        <tr><td style="padding:20px 32px 28px;">
+          <p style="margin:0 0 4px;font-size:12px;color:#52525b;">&mdash; Bhavesh, Founder of Idearupt</p>
+          <p style="margin:0 0 4px;font-size:11px;color:#3f3f46;">You&apos;re receiving this because you signed up for Idearupt.</p>
+          <p style="margin:0;font-size:11px;color:#3f3f46;"><a href="#" style="color:#8B5CF6;text-decoration:underline;">Unsubscribe</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Privacy</a> &middot; <a href="#" style="color:#8B5CF6;text-decoration:none;">Terms</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>'></iframe>
+</div>
+
+<div style="height:80px;"></div>
+</div>
+</body>
+</html>
