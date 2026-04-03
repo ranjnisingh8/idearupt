@@ -37,7 +37,7 @@ const ShareModal = ({ open, onClose, ideaId, ideaTitle, score, oneLiner, painSco
       document.removeEventListener("keydown", handleEsc);
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
     };
-  }, [open, onClose]);
+  }, [open, onClose, ideaId]);
   const shareUrl = `${window.location.origin}/idea/${ideaId}`;
   const shareText = `Just found a problem scoring ${score.toFixed(1)}/10 on Idearupt \u{1F525}\n\n${ideaTitle} — ${oneLiner || ""}\n\nPain level: ${painScore?.toFixed(1) || "?"}/10\n\n${shareUrl}`;
 
@@ -49,7 +49,9 @@ const ShareModal = ({ open, onClose, ideaId, ideaTitle, score, oneLiner, painSco
     try {
       await supabase.from("user_interactions").insert({ user_id: user.id, idea_id: ideaId, action: "shared" });
       recordActivity("share", 20);
-    } catch {}
+    } catch {
+      // silently fail tracking
+    }
     toast({ title: "\u{1F389} You unlocked 5 more views!" });
   }, [user, ideaId, recordActivity]);
 
@@ -63,9 +65,9 @@ const ShareModal = ({ open, onClose, ideaId, ideaTitle, score, oneLiner, painSco
       });
       trackShare("native");
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       // User cancelled share — not an error
-      if (err?.name !== "AbortError") {
+      if ((err as Error)?.name !== "AbortError") {
         toast({ title: "Share failed", variant: "destructive" });
       }
     }

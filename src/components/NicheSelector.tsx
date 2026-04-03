@@ -42,7 +42,9 @@ const NicheSelector = ({ selected, onChange, max = 3, storageKey, showCustom }: 
         if (Array.isArray(parsed) && parsed.length > 0) {
           onChange(parsed);
         }
-      } catch {}
+      } catch {
+        // ignore parse error
+      }
     }
   }, [storageKey]); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -159,7 +159,9 @@ export const useIdeaValidation = () => {
           inputText: ideaText,
         });
         localStorage.setItem("idearupt_validations", JSON.stringify(history.slice(0, 20)));
-      } catch {}
+      } catch {
+        // ignore storage errors
+      }
 
       toast.success("Analysis complete!");
     } catch (err: any) {

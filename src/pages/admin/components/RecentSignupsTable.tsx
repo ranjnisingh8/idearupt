@@ -39,7 +39,7 @@ const RecentSignupsTable = ({ signups, onUserClick }: RecentSignupsTableProps) =
                 const d = new Date(signup.created_at);
                 timeStr = format(d, "h:mm a");
                 relativeStr = formatDistanceToNow(d, { addSuffix: true });
-              } catch {}
+              } catch { /* ignore */ }
               return (
                 <motion.div
                   key={signup.id}

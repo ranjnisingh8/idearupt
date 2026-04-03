@@ -37,7 +37,7 @@ const TrialBanner = () => {
     setDismissed(true);
     try {
       localStorage.setItem(DISMISSED_KEY, String(Date.now()));
-    } catch {}
+    } catch { /* ignore */ }
   };
 
   // Hide on auth/onboarding pages

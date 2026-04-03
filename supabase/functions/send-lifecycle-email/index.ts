@@ -733,7 +733,7 @@ function getEmailContent(
         text: `Your trial ends in 2 days.\n\nYour card will be charged ${priceLabel} automatically when the trial ends.\n\nIf you'd like to cancel before then, you can do so anytime from your Settings page — no charge.\n\nHere's what you'll keep with Pro:\n✓ PDF exports — download & share any idea report\n✓ Original source threads — see where every problem was found\n✓ Compare ideas side by side\n✓ Unlimited saves & higher daily limits\n✓ Pain Radar — live complaint feed filtered by your niche\n✓ Sniper Mode Alerts — get emailed when problems match your criteria\n\nExplore: https://idearupt.ai/feed`,
       };
 
-    case "day7_expired":
+    case "day7_expired": {
       // For card-required users (plan_status='trial'), LS auto-charges them
       if (planStatus === "trial" || planStatus === "active") {
         return {
@@ -776,6 +776,7 @@ function getEmailContent(
         `),
         text: `Your Pro trial wrapped up — here's what's next.\n\nYour 7-day Pro trial has ended. You're now on the Free plan — you still get full idea details and 3 ideas per day.\n\nPro features are now paused, but you can pick up where you left off anytime:\n✨ PDF exports — download & share any idea report\n✨ Original source threads — see where every problem was found\n✨ Compare ideas side by side\n✨ Unlimited saves & higher daily limits\n✨ Pain Radar — live complaint feed filtered by your niche\n✨ Sniper Mode Alerts — get emailed when problems match your criteria\n\nContinue with Pro — ${priceLabel}: ${cUrl}\n\nOr keep exploring on Free: https://idearupt.ai/feed`,
       };
+    }
 
     case "day10_nudge":
       return {

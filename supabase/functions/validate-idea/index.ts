@@ -265,6 +265,7 @@ Respond with ONLY this JSON structure:
       if (jsonMatch) {
         try { analysis = JSON.parse(jsonMatch[0]); } catch {
           try {
+            // eslint-disable-next-line no-control-regex
             const cleaned = jsonMatch[0].replace(/,\s*([}\]])/g, '$1').replace(/[\x00-\x1F\x7F]/g, ' ');
             analysis = JSON.parse(cleaned);
           } catch { /* give up */ }

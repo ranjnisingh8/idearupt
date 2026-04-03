@@ -45,7 +45,7 @@ export function computeDateRange(preset: DateRangePreset, customStart?: Date, cu
       previousEndDate = endOfDay(subDays(now, 30));
       label = "Last 30 Days";
       break;
-    case "custom":
+    case "custom": {
       startDate = customStart ? startOfDay(customStart) : startOfDay(now);
       endDate = customEnd ? endOfDay(customEnd) : now;
       const durationMs = endDate.getTime() - startDate.getTime();
@@ -53,6 +53,7 @@ export function computeDateRange(preset: DateRangePreset, customStart?: Date, cu
       previousStartDate = new Date(previousEndDate.getTime() - durationMs);
       label = `${format(startDate, "MMM d")} - ${format(endDate, "MMM d")}`;
       break;
+    }
     default:
       startDate = startOfDay(now);
       endDate = now;
@@ -192,7 +193,7 @@ export function useAdminData() {
       try {
         const { data } = await supabase.rpc("admin_get_active_users", { minutes_threshold: 5 });
         if (data) setActiveUsers(data);
-      } catch {}
+      } catch { /* ignore */ }
     };
     fetchActive();
     const interval = setInterval(fetchActive, 15000);

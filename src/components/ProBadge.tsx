@@ -34,7 +34,9 @@ const ProBadge = ({ feature, size = "sm", className = "" }: ProBadgeProps) => {
     if (feature) {
       try {
         sessionStorage.setItem(`pro-tooltip-${feature}`, "1");
-      } catch {}
+      } catch {
+        // ignore quota errors
+      }
     }
   };
 
@@ -90,7 +92,11 @@ const ProBadge = ({ feature, size = "sm", className = "" }: ProBadgeProps) => {
               onClick={(e) => {
                 e.stopPropagation();
                 setShowTooltip(false);
-                user ? openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id) : navigate("/auth?redirect=feed");
+                if (user) {
+                  openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id);
+                } else {
+                  navigate("/auth?redirect=feed");
+                }
               }}
               className="font-heading text-[11px] font-semibold transition-colors"
               style={{ color: !hasUsedTrial ? "#F59E0B" : "#9585F2" }}

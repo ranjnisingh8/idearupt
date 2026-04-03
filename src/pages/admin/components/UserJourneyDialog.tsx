@@ -82,7 +82,7 @@ const UserJourneyDialog = ({ userId, userEmail, onClose }: UserJourneyDialogProp
                   const d = new Date(evt.created_at);
                   timeStr = format(d, "MMM d, h:mm:ss a");
                   relStr = formatDistanceToNow(d, { addSuffix: true });
-                } catch {}
+                } catch { /* ignore */ }
                 return (
                   <div
                     key={evt.id}

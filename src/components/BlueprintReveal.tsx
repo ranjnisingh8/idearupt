@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Hammer, Lock, Sparkles, Clock } from "lucide-react";
@@ -77,6 +77,44 @@ const BlueprintReveal = ({ markdown, blurHitCount = 0, onBlurHit }: BlueprintRev
   const [isRevealing, setIsRevealing] = useState(false);
   const revealTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const safeMarkdown = markdown || "";
+  const stats = parseStats(safeMarkdown);
+  const sections = splitSections(safeMarkdown);
+  const execSummary = getExecutiveSummary(safeMarkdown);
+
+  // Start typewriter-style section reveal for full-access users
+  const startReveal = useCallback(() => {
+    if (isRevealing || revealedSections >= sections.length) return;
+    setIsRevealing(true);
+    setRevealedSections(1); // Show first section immediately
+
+    let current = 1;
+    revealTimerRef.current = setInterval(() => {
+      current++;
+      setRevealedSections(current);
+      if (current >= sections.length) {
+        if (revealTimerRef.current) clearInterval(revealTimerRef.current);
+        setIsRevealing(false);
+      }
+    }, 400); // 400ms between sections for "thinking" effect
+  }, [isRevealing, revealedSections, sections.length]);
+
+  // Cleanup timer
+  useEffect(() => {
+    return () => {
+      if (revealTimerRef.current) clearInterval(revealTimerRef.current);
+    };
+  }, []);
+
+  // Auto-start reveal for full access users when they scroll to it
+  useEffect(() => {
+    if (!isLocked && markdown && revealedSections === 0) {
+      // Small delay for UX polish
+      const t = setTimeout(() => startReveal(), 300);
+      return () => clearTimeout(t);
+    }
+  }, [isLocked, markdown, revealedSections, startReveal]);
+
   // ── NULL state: content not yet generated ──
   if (!markdown) {
     return (
@@ -97,10 +135,6 @@ const BlueprintReveal = ({ markdown, blurHitCount = 0, onBlurHit }: BlueprintRev
       </div>
     );
   }
-
-  const stats = parseStats(markdown);
-  const sections = splitSections(markdown);
-  const execSummary = getExecutiveSummary(markdown);
 
   // ── Hard paywall: no card entered, or trial expired without paying ──
   if (isHardPaywall) {
@@ -154,9 +188,11 @@ const BlueprintReveal = ({ markdown, blurHitCount = 0, onBlurHit }: BlueprintRev
           <button
             onClick={(e) => {
               e.stopPropagation();
-              user
-                ? openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id)
-                : navigate("/auth?redirect=feed");
+              if (user) {
+                openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id);
+              } else {
+                navigate("/auth?redirect=feed");
+              }
             }}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white transition-all hover:scale-[1.03]"
             style={{ background: "linear-gradient(135deg, #F59E0B, #F97316)", boxShadow: "0 4px 16px -4px rgba(245,158,11,0.35)" }}
@@ -170,39 +206,6 @@ const BlueprintReveal = ({ markdown, blurHitCount = 0, onBlurHit }: BlueprintRev
       </div>
     );
   }
-
-  // Start typewriter-style section reveal for full-access users
-  const startReveal = () => {
-    if (isRevealing || revealedSections >= sections.length) return;
-    setIsRevealing(true);
-    setRevealedSections(1); // Show first section immediately
-
-    let current = 1;
-    revealTimerRef.current = setInterval(() => {
-      current++;
-      setRevealedSections(current);
-      if (current >= sections.length) {
-        if (revealTimerRef.current) clearInterval(revealTimerRef.current);
-        setIsRevealing(false);
-      }
-    }, 400); // 400ms between sections for "thinking" effect
-  };
-
-  // Cleanup timer
-  useEffect(() => {
-    return () => {
-      if (revealTimerRef.current) clearInterval(revealTimerRef.current);
-    };
-  }, []);
-
-  // Auto-start reveal for full access users when they scroll to it
-  useEffect(() => {
-    if (!isLocked && markdown && revealedSections === 0) {
-      // Small delay for UX polish
-      const t = setTimeout(() => startReveal(), 300);
-      return () => clearTimeout(t);
-    }
-  }, [isLocked, markdown]);
 
   const markdownComponents = {
     h2: ({ children }: any) => <h4 className="font-heading text-base font-semibold mt-5 mb-2" style={{ color: "var(--text-primary)" }}>{children}</h4>,
@@ -334,7 +337,11 @@ const BlueprintReveal = ({ markdown, blurHitCount = 0, onBlurHit }: BlueprintRev
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  user ? openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id) : navigate("/auth?redirect=feed");
+                  if (user) {
+                    openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id);
+                  } else {
+                    navigate("/auth?redirect=feed");
+                  }
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white transition-all hover:scale-[1.03]"
                 style={{ background: !hasUsedTrial ? "linear-gradient(135deg, #F59E0B, #F97316)" : "#7C6AED", boxShadow: !hasUsedTrial ? "0 4px 16px -4px rgba(245,158,11,0.3)" : "0 4px 16px -4px rgba(124,106,237,0.3)" }}

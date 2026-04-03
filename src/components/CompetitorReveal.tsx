@@ -46,6 +46,31 @@ const CompetitorReveal = ({ competitors, blurHitCount = 0, onBlurHit }: Competit
   const isLocked = false;
   const [revealedCards, setRevealedCards] = useState<number>(0);
 
+  // Auto-reveal cards with stagger for full-access users
+  useEffect(() => {
+    const compLen = competitors?.length || 0;
+    if (!isLocked && compLen > 0 && revealedCards === 0) {
+      const t = setTimeout(() => {
+        let current = 0;
+        const interval = setInterval(() => {
+          current++;
+          setRevealedCards(current);
+          if (current >= compLen) clearInterval(interval);
+        }, 200); // 200ms stagger between cards
+        return () => clearInterval(interval);
+      }, 200);
+      return () => clearTimeout(t);
+    }
+  }, [isLocked, competitors?.length, revealedCards]);
+
+  // For locked users, show first card immediately
+  useEffect(() => {
+    const compLen = competitors?.length || 0;
+    if (isLocked && compLen > 0) {
+      setRevealedCards(compLen); // Show all (first visible, rest blurred by CSS)
+    }
+  }, [isLocked, competitors?.length]);
+
   // ── NULL state: content not yet generated ──
   if (!competitors || competitors.length === 0) {
     if (competitors === null || competitors === undefined) {
@@ -69,29 +94,6 @@ const CompetitorReveal = ({ competitors, blurHitCount = 0, onBlurHit }: Competit
     }
     return null; // Empty array = no competitors found
   }
-
-  // Auto-reveal cards with stagger for full-access users
-  useEffect(() => {
-    if (!isLocked && competitors.length > 0 && revealedCards === 0) {
-      const t = setTimeout(() => {
-        let current = 0;
-        const interval = setInterval(() => {
-          current++;
-          setRevealedCards(current);
-          if (current >= competitors.length) clearInterval(interval);
-        }, 200); // 200ms stagger between cards
-        return () => clearInterval(interval);
-      }, 200);
-      return () => clearTimeout(t);
-    }
-  }, [isLocked, competitors.length]);
-
-  // For locked users, show first card immediately
-  useEffect(() => {
-    if (isLocked && competitors.length > 0) {
-      setRevealedCards(competitors.length); // Show all (first visible, rest blurred by CSS)
-    }
-  }, [isLocked, competitors.length]);
 
   const renderCompetitorCard = (c: Competitor, i: number, showDetails: boolean) => {
     const priceColor = getPricingColor(c.pricing);
@@ -220,9 +222,11 @@ const CompetitorReveal = ({ competitors, blurHitCount = 0, onBlurHit }: Competit
           <button
             onClick={(e) => {
               e.stopPropagation();
-              user
-                ? openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id)
-                : navigate("/auth?redirect=feed");
+              if (user) {
+                openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id);
+              } else {
+                navigate("/auth?redirect=feed");
+              }
             }}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white transition-all hover:scale-[1.03]"
             style={{ background: "linear-gradient(135deg, #F59E0B, #F97316)", boxShadow: "0 4px 16px -4px rgba(245,158,11,0.35)" }}
@@ -325,7 +329,11 @@ const CompetitorReveal = ({ competitors, blurHitCount = 0, onBlurHit }: Competit
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    user ? openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id) : navigate("/auth?redirect=feed");
+                    if (user) {
+                      openCheckout(resolveCheckoutPlan(userPlan, hasUsedTrial), user.email || undefined, user.id);
+                    } else {
+                      navigate("/auth?redirect=feed");
+                    }
                   }}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white transition-all hover:scale-[1.03] mt-2"
                   style={{ background: !hasUsedTrial ? "linear-gradient(135deg, #F59E0B, #F97316)" : "#7C6AED", boxShadow: !hasUsedTrial ? "0 4px 16px -4px rgba(245,158,11,0.3)" : "0 4px 16px -4px rgba(124,106,237,0.3)" }}

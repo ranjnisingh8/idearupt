@@ -38,7 +38,7 @@ const ActiveUsersPanel = ({ activeUsers, onUserClick }: ActiveUsersPanelProps) =
           let lastSeenLabel = "";
           try {
             lastSeenLabel = formatDistanceToNow(new Date(user.last_seen), { addSuffix: true });
-          } catch {}
+          } catch { /* ignore */ }
           return (
             <div
               key={user.user_id || user.user_email || Math.random()}
