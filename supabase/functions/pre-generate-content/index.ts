@@ -1,5 +1,9 @@
+// @ts-ignore - Supabase Edge Functions use Deno, which supports URL imports. Standard TS compiler does not.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+declare const Deno: any;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -24,7 +28,7 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: getCorsHeaders(req) });
   }
@@ -36,11 +40,11 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") || Deno.env.get("ANTHROPIC_API_KEY") || Deno.env.get("ANTHROPIC KEY") || "";
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") || "";
 
     if (!OPENROUTER_API_KEY) {
       return new Response(JSON.stringify({ error: "No OpenRouter API key found" }), {
-        status: 500, headers: { "Content-Type": "application/json" },
+        status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -66,14 +70,14 @@ serve(async (req) => {
     if (fetchErr) {
       logMsg(`[pre-generate] Fetch error: ${fetchErr.message}`);
       return new Response(JSON.stringify({ error: fetchErr.message, log }), {
-        status: 500, headers: { "Content-Type": "application/json" },
+        status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
     if (!ideas || ideas.length === 0) {
       logMsg("[pre-generate] All ideas already have content — nothing to do");
       return new Response(JSON.stringify({ success: true, message: "All ideas have content", stats: { processed: 0 }, log }), {
-        status: 200, headers: { "Content-Type": "application/json" },
+        status: 200, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
       });
     }
 
@@ -83,7 +87,6 @@ serve(async (req) => {
     let blueprintFailed = 0;
     let competitorSucceeded = 0;
     let competitorFailed = 0;
-    let skipped = 0;
 
     for (const idea of ideas) {
       const needsBlueprint = !idea.blueprint_markdown;
@@ -333,12 +336,12 @@ RULES:
       },
       log,
     }), {
-      status: 200, headers: { "Content-Type": "application/json" },
+      status: 200, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     logMsg(`[pre-generate] Fatal error: ${e instanceof Error ? e.message : String(e)}`);
     return new Response(JSON.stringify({ error: "Something went wrong. Please try again.", log, elapsed_ms: Date.now() - startTime }), {
-      status: 500, headers: { "Content-Type": "application/json" },
+      status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });
