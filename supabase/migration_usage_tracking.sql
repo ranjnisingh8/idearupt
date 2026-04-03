@@ -46,32 +46,52 @@ CREATE INDEX IF NOT EXISTS idx_waitlist_email ON pro_waitlist(email);
 ALTER TABLE pro_waitlist ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Anyone can join waitlist' AND tablename = 'pro_waitlist') THEN
-    CREATE POLICY "Anyone can join waitlist" ON pro_waitlist FOR INSERT WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can view waitlist' AND tablename = 'pro_waitlist') THEN
-    CREATE POLICY "Users can view waitlist" ON pro_waitlist FOR SELECT USING (true);
-  END IF;
+  DROP POLICY IF EXISTS "Anyone can join waitlist" ON pro_waitlist;
+  DROP POLICY IF EXISTS "Users can view waitlist" ON pro_waitlist;
+  
+  CREATE POLICY "Public waitlist signup" ON pro_waitlist
+    FOR INSERT WITH CHECK (user_id IS NULL OR auth.uid() = user_id);
+    
+  CREATE POLICY "Users view own waitlist" ON pro_waitlist
+    FOR SELECT USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
--- 3. Function to check daily usage
+-- 3. Function to check daily usage with rate limiting
 CREATE OR REPLACE FUNCTION check_daily_usage(
-  check_user_id UUID,
   check_feature TEXT,
   daily_limit INTEGER
 )
 RETURNS JSON AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
+  v_req_count INTEGER;
   current_count INTEGER;
   can_use BOOLEAN;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
+  -- Rate limit: max 50 checks per minute
+  SELECT COUNT(*) INTO v_req_count
+  FROM request_logs
+  WHERE user_id = v_user_id
+    AND action = 'check_daily_usage'
+    AND created_at > NOW() - INTERVAL '1 minute';
+
+  IF v_req_count > 50 THEN
+    RAISE EXCEPTION 'Rate limit exceeded';
+  END IF;
+  
   SELECT COALESCE(SUM(count), 0) INTO current_count
   FROM usage_tracking
-  WHERE user_id = check_user_id
+  WHERE user_id = v_user_id
   AND feature = check_feature
   AND used_at = CURRENT_DATE;
 
   can_use := current_count < daily_limit;
+
+  INSERT INTO request_logs (user_id, action) VALUES (v_user_id, 'check_daily_usage');
 
   RETURN json_build_object(
     'can_use', can_use,
@@ -84,28 +104,36 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 4. Function to increment usage
 CREATE OR REPLACE FUNCTION increment_usage(
-  inc_user_id UUID,
   inc_feature TEXT
 )
 RETURNS VOID AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   INSERT INTO usage_tracking (user_id, feature, used_at, count)
-  VALUES (inc_user_id, inc_feature, CURRENT_DATE, 1)
+  VALUES (v_user_id, inc_feature, CURRENT_DATE, 1)
   ON CONFLICT (user_id, feature, used_at)
   DO UPDATE SET count = usage_tracking.count + 1;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 5. Function to get all daily usage for a user (batch fetch)
-CREATE OR REPLACE FUNCTION get_daily_usage(check_user_id UUID)
+CREATE OR REPLACE FUNCTION get_daily_usage()
 RETURNS JSON AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   result JSON;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   SELECT json_object_agg(feature, count)
   INTO result
   FROM usage_tracking
-  WHERE user_id = check_user_id
+  WHERE user_id = v_user_id
   AND used_at = CURRENT_DATE;
 
   RETURN COALESCE(result, '{}'::json);

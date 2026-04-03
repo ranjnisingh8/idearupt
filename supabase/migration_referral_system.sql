@@ -167,44 +167,43 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ─── 6. get_my_referral_stats RPC ────────────────────────────
 -- Returns referral stats for the calling user
-CREATE OR REPLACE FUNCTION get_my_referral_stats(p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_my_referral_stats()
 RETURNS JSON AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   result JSON;
   ref_code TEXT;
   clicks INTEGER;
 BEGIN
-  -- Verify the caller is the user
-  IF auth.uid() != p_user_id THEN
+  IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
-
   SELECT u.referral_code, COALESCE(u.referral_clicks, 0)
   INTO ref_code, clicks
-  FROM users u WHERE u.id = p_user_id;
+  FROM users u WHERE u.id = v_user_id;
 
   SELECT json_build_object(
     'referral_code', ref_code,
     'total_clicks', clicks,
     'total_signups', (
       SELECT COUNT(*) FROM referral_events
-      WHERE referrer_id = p_user_id AND event_type = 'signup'
+      WHERE referrer_id = v_user_id AND event_type = 'signup'
     ),
     'total_conversions', (
       SELECT COUNT(*) FROM referral_events
-      WHERE referrer_id = p_user_id AND event_type = 'conversion'
+      WHERE referrer_id = v_user_id AND event_type = 'conversion'
     ),
     'total_earnings', (
       SELECT COALESCE(SUM(commission_amount), 0) FROM referral_events
-      WHERE referrer_id = p_user_id AND event_type = 'conversion'
+      WHERE referrer_id = v_user_id AND event_type = 'conversion'
     ),
     'pending_earnings', (
       SELECT COALESCE(SUM(commission_amount), 0) FROM referral_events
-      WHERE referrer_id = p_user_id AND event_type = 'conversion' AND commission_status = 'pending'
+      WHERE referrer_id = v_user_id AND event_type = 'conversion' AND commission_status = 'pending'
     ),
     'paid_earnings', (
       SELECT COALESCE(SUM(commission_amount), 0) FROM referral_events
-      WHERE referrer_id = p_user_id AND event_type = 'conversion' AND commission_status = 'paid'
+      WHERE referrer_id = v_user_id AND event_type = 'conversion' AND commission_status = 'paid'
     )
   ) INTO result;
 
@@ -215,12 +214,13 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ─── 7. get_my_referral_history RPC ──────────────────────────
 -- Returns referral events for the calling user (as referrer)
-CREATE OR REPLACE FUNCTION get_my_referral_history(p_user_id UUID, p_limit INTEGER DEFAULT 50)
+CREATE OR REPLACE FUNCTION get_my_referral_history(p_limit INTEGER DEFAULT 50)
 RETURNS JSON AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   result JSON;
 BEGIN
-  IF auth.uid() != p_user_id THEN
+  IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
@@ -241,7 +241,7 @@ BEGIN
       END AS referred_email
     FROM referral_events re
     LEFT JOIN users u ON u.id = re.referred_id
-    WHERE re.referrer_id = p_user_id
+    WHERE re.referrer_id = v_user_id
     ORDER BY re.created_at DESC
     LIMIT p_limit
   ) t;
@@ -260,10 +260,23 @@ CREATE OR REPLACE FUNCTION record_referral_conversion(
 )
 RETURNS VOID AS $$
 DECLARE
+  v_req_count INT;
   ref_code TEXT;
   referrer_user_id UUID;
   commission NUMERIC(10,2);
 BEGIN
+  -- Rate limit: max 50 conversions per minute (webhook safety)
+  SELECT COUNT(*) INTO v_req_count
+  FROM request_logs
+  WHERE action = 'record_referral_conversion'
+    AND created_at > NOW() - INTERVAL '1 minute';
+
+  IF v_req_count > 50 THEN
+    RAISE EXCEPTION 'Rate limit exceeded';
+  END IF;
+
+  INSERT INTO request_logs (action) VALUES ('record_referral_conversion');
+  
   -- Get the referred_by code for this user
   SELECT referred_by INTO ref_code FROM users WHERE id = p_referred_id;
 
@@ -284,6 +297,10 @@ BEGIN
   -- Insert conversion event (prevent duplicates for same payment)
   INSERT INTO referral_events (referrer_id, referred_id, event_type, payment_amount, commission_amount, commission_status)
   VALUES (referrer_user_id, p_referred_id, 'conversion', p_payment_amount, commission, 'pending');
+  
+  -- Audit log
+  INSERT INTO audit_logs (user_id, admin_id, action, target_id, metadata)
+  VALUES (referrer_user_id, referrer_user_id, 'referral_conversion', p_referred_id, jsonb_build_object('commission', commission, 'payment_amount', p_payment_amount));
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

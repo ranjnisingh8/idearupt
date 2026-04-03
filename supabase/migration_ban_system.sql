@@ -24,16 +24,17 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-  caller_email TEXT;
+  v_admin_id UUID := auth.uid();
   affected INT;
 BEGIN
-  -- Admin guard (matches admin_get_suspicious_accounts pattern)
-  SELECT email INTO caller_email FROM auth.users WHERE id = auth.uid();
-  IF caller_email IS NULL OR caller_email NOT IN ('garagefitness4@gmail.com') THEN
-    RAISE EXCEPTION 'Unauthorized: admin access required';
+  IF v_admin_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
   END IF;
-
-  -- Ban all accounts in the cluster
+  IF NOT EXISTS (
+    SELECT 1 FROM users WHERE id = v_admin_id AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   UPDATE public.users
   SET is_banned = true,
       banned_at = NOW(),
@@ -43,6 +44,9 @@ BEGIN
     AND (is_banned IS NULL OR is_banned = false);
 
   GET DIAGNOSTICS affected = ROW_COUNT;
+
+  INSERT INTO audit_logs (admin_id, action, metadata)
+  VALUES (v_admin_id, 'admin_ban_cluster', jsonb_build_object('emails', p_emails, 'reason', p_reason, 'affected_count', affected));
 
   RETURN json_build_object(
     'success', true,
@@ -64,16 +68,21 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-  caller_email TEXT;
+  v_admin_id UUID := auth.uid();
+  v_target_user UUID;
   old_status TEXT;
 BEGIN
-  SELECT email INTO caller_email FROM auth.users WHERE id = auth.uid();
-  IF caller_email IS NULL OR caller_email NOT IN ('garagefitness4@gmail.com') THEN
-    RAISE EXCEPTION 'Unauthorized: admin access required';
+  IF v_admin_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM users WHERE id = v_admin_id AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Unauthorized';
   END IF;
 
   -- Get current status
-  SELECT subscription_status INTO old_status FROM public.users WHERE email = p_email;
+  SELECT id, subscription_status INTO v_target_user, old_status FROM public.users WHERE email = p_email;
 
   -- Restore original subscription_status from the banned_was_ prefix
   UPDATE public.users
@@ -85,6 +94,9 @@ BEGIN
         ELSE COALESCE(old_status, 'free')
       END
   WHERE email = p_email;
+
+  INSERT INTO audit_logs (admin_id, user_id, action, target_id, metadata)
+  VALUES (v_admin_id, v_admin_id, 'admin_unban_user', v_target_user, jsonb_build_object('email', p_email));
 
   RETURN json_build_object('success', true, 'email', p_email);
 END;
@@ -104,11 +116,11 @@ AS $$
 DECLARE
   fp_dupes JSON;
   ip_clusters_data JSON;
-  caller_email TEXT;
 BEGIN
-  SELECT email INTO caller_email FROM auth.users WHERE id = auth.uid();
-  IF caller_email IS NULL OR caller_email NOT IN ('garagefitness4@gmail.com') THEN
-    RAISE EXCEPTION 'Unauthorized: admin access required';
+  IF NOT EXISTS (
+    SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Unauthorized';
   END IF;
 
   -- Fingerprint duplicates (limit 50)

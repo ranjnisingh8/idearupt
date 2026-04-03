@@ -110,7 +110,6 @@ $$;
 
 -- 4. RPC: Save fingerprint to user row
 CREATE OR REPLACE FUNCTION public.save_user_fingerprint(
-  p_user_id UUID,
   p_fingerprint TEXT,
   p_flagged BOOLEAN DEFAULT false
 )
@@ -118,18 +117,26 @@ RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   UPDATE public.users
   SET device_fingerprint = p_fingerprint,
       flagged_duplicate = p_flagged
-  WHERE id = p_user_id;
+  WHERE id = v_user_id;
+  
+  INSERT INTO audit_logs (user_id, admin_id, action, metadata)
+  VALUES (v_user_id, v_user_id, 'save_user_fingerprint', jsonb_build_object('flagged', p_flagged));
 END;
 $$;
 
 -- GRANTs for RPCs
 GRANT EXECUTE ON FUNCTION public.check_fingerprint_abuse(TEXT) TO anon;
 GRANT EXECUTE ON FUNCTION public.check_fingerprint_abuse(TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.save_user_fingerprint(UUID, TEXT, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.save_user_fingerprint(TEXT, BOOLEAN) TO authenticated;
 
 -- Verify
 SELECT 'Migration complete: device_fingerprint, flagged_duplicate columns added, signup_attempts table created, RPCs ready.' AS status;

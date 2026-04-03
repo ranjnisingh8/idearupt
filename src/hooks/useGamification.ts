@@ -112,9 +112,7 @@ export const useGamification = () => {
 
     const fetchState = async () => {
       try {
-        const { data, error } = await supabase.rpc("get_gamification_state", {
-          p_user_id: user.id,
-        });
+        const { data, error } = await supabase.rpc("get_gamification_state");
 
         if (error || !data || data.error) {
           setState((s) => ({ ...s, loading: false }));
@@ -151,7 +149,6 @@ export const useGamification = () => {
 
       try {
         const { data, error } = await supabase.rpc("record_activity", {
-          p_user_id: user.id,
           p_action: action,
           p_xp_amount: xpAmount,
         });

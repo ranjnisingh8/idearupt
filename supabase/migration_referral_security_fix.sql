@@ -22,7 +22,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Fix save_user_signup_meta with auth check
 CREATE OR REPLACE FUNCTION save_user_signup_meta(
-  p_user_id UUID,
   p_utm_source TEXT DEFAULT NULL,
   p_utm_medium TEXT DEFAULT NULL,
   p_utm_campaign TEXT DEFAULT NULL,
@@ -30,30 +29,23 @@ CREATE OR REPLACE FUNCTION save_user_signup_meta(
 )
 RETURNS VOID AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   referrer_user_id UUID;
 BEGIN
-  -- Verify the caller is the user (prevent spoofing referrals for other users)
-  IF auth.uid() != p_user_id THEN
+  IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
-
-  -- Update UTM data (last-touch: always overwrite)
   UPDATE users SET
     utm_source = COALESCE(p_utm_source, utm_source),
     utm_medium = COALESCE(p_utm_medium, utm_medium),
     utm_campaign = COALESCE(p_utm_campaign, utm_campaign),
-    -- Referral: first-touch (only set if not already set)
     referred_by = COALESCE(referred_by, p_referred_by)
-  WHERE id = p_user_id;
-
-  -- If a referral code was provided and the user now has referred_by set,
-  -- create a signup referral event (only if one doesn't already exist)
+  WHERE id = v_user_id;
   IF p_referred_by IS NOT NULL THEN
     SELECT id INTO referrer_user_id FROM users WHERE referral_code = p_referred_by LIMIT 1;
-
-    IF referrer_user_id IS NOT NULL AND referrer_user_id != p_user_id THEN
+    IF referrer_user_id IS NOT NULL AND referrer_user_id != v_user_id THEN
       INSERT INTO referral_events (referrer_id, referred_id, event_type)
-      VALUES (referrer_user_id, p_user_id, 'signup')
+      VALUES (referrer_user_id, v_user_id, 'signup')
       ON CONFLICT DO NOTHING;
     END IF;
   END IF;

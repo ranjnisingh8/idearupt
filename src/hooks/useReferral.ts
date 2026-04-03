@@ -46,8 +46,8 @@ export function useReferral() {
 
     try {
       const [statsRes, historyRes] = await Promise.all([
-        supabase.rpc("get_my_referral_stats", { p_user_id: user.id }),
-        supabase.rpc("get_my_referral_history", { p_user_id: user.id, p_limit: 50 }),
+        supabase.rpc("get_my_referral_stats"),
+        supabase.rpc("get_my_referral_history", { p_limit: 50 }),
       ]);
 
       if (statsRes.data) {

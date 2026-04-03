@@ -14,7 +14,6 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS daily_challenge_completed_at D
 
 -- 2. record_activity RPC — atomic streak + XP update
 CREATE OR REPLACE FUNCTION public.record_activity(
-  p_user_id UUID,
   p_action TEXT,
   p_xp_amount INT DEFAULT 0
 )
@@ -24,6 +23,7 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   v_today DATE := CURRENT_DATE;
   v_user RECORD;
   v_streak_broken BOOLEAN := FALSE;
@@ -36,11 +36,14 @@ DECLARE
   v_level_up BOOLEAN := FALSE;
   v_thresholds INT[] := ARRAY[0, 50, 150, 400, 800, 1500, 3000, 5000, 8000, 12000];
 BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Unauthorized');
+  END IF;
   -- Lock the user row to prevent race conditions
   SELECT current_streak, longest_streak, last_active_date, xp, level
   INTO v_user
   FROM public.users
-  WHERE id = p_user_id
+  WHERE id = v_user_id
   FOR UPDATE;
 
   IF NOT FOUND THEN
@@ -92,7 +95,7 @@ BEGIN
     last_active_date = v_today,
     xp = v_new_xp,
     level = v_new_level
-  WHERE id = p_user_id;
+  WHERE id = v_user_id;
 
   RETURN jsonb_build_object(
     'current_streak', v_new_streak,
@@ -109,19 +112,23 @@ END;
 $$;
 
 -- 3. get_gamification_state RPC
-CREATE OR REPLACE FUNCTION public.get_gamification_state(p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.get_gamification_state()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   v_user RECORD;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Unauthorized');
+  END IF;
   SELECT current_streak, longest_streak, last_active_date, xp, level, daily_challenge_completed_at
   INTO v_user
   FROM public.users
-  WHERE id = p_user_id;
+  WHERE id = v_user_id;
 
   IF NOT FOUND THEN
     RETURN jsonb_build_object('error', 'user_not_found');
@@ -142,34 +149,34 @@ END;
 $$;
 
 -- 4. complete_daily_challenge RPC
-CREATE OR REPLACE FUNCTION public.complete_daily_challenge(p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.complete_daily_challenge()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   v_today DATE := CURRENT_DATE;
   v_completed_at DATE;
   v_result JSONB;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Unauthorized');
+  END IF;
   SELECT daily_challenge_completed_at INTO v_completed_at
   FROM public.users
-  WHERE id = p_user_id;
-
+  WHERE id = v_user_id;
   -- Guard against double-claim
   IF v_completed_at = v_today THEN
     RETURN jsonb_build_object('already_claimed', true);
   END IF;
-
   -- Mark as completed
   UPDATE public.users
   SET daily_challenge_completed_at = v_today
-  WHERE id = p_user_id;
-
+  WHERE id = v_user_id;
   -- Grant XP via record_activity
-  SELECT public.record_activity(p_user_id, 'daily_challenge', 50) INTO v_result;
-
+  SELECT public.record_activity('daily_challenge', 50) INTO v_result;
   RETURN jsonb_build_object(
     'claimed', true,
     'activity_result', v_result
@@ -178,9 +185,9 @@ END;
 $$;
 
 -- 5. Grant execute permissions
-GRANT EXECUTE ON FUNCTION public.record_activity(UUID, TEXT, INT) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_gamification_state(UUID) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.complete_daily_challenge(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.record_activity(TEXT, INT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_gamification_state() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.complete_daily_challenge() TO authenticated;
 
 -- 6. Backfill: Calculate XP from historical user_interactions
 DO $$

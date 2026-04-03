@@ -26,9 +26,7 @@ export const useUsage = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc("get_daily_usage", {
-        check_user_id: user.id,
-      });
+      const { data, error } = await supabase.rpc("get_daily_usage");
 
       if (error) {
         // Fallback: direct query
@@ -120,7 +118,6 @@ export const useUsage = () => {
       // Persist to database
       try {
         await supabase.rpc("increment_usage", {
-          inc_user_id: user.id,
           inc_feature: feature,
         });
       } catch {

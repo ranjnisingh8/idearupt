@@ -100,9 +100,7 @@ export const useProStatus = (): ProStatus => {
     try {
       // Fetch plan status via new RPC (includes all fields)
       const { data: planData } = await Promise.resolve(
-        supabase.rpc("get_user_plan_status", {
-          p_user_id: user.id,
-        })
+        supabase.rpc("get_user_plan_status")
       );
 
       if (planData) {
@@ -116,9 +114,7 @@ export const useProStatus = (): ProStatus => {
       } else {
         // Fallback: try legacy RPC
         const { data: trialData } = await Promise.resolve(
-          supabase.rpc("get_user_trial_status", {
-            p_user_id: user.id,
-          })
+          supabase.rpc("get_user_trial_status")
         );
 
         if (trialData) {

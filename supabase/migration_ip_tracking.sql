@@ -8,7 +8,6 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS signup_ip TEXT;
 
 -- 2. Update save_user_fingerprint RPC to also save IP
 CREATE OR REPLACE FUNCTION public.save_user_fingerprint(
-  p_user_id UUID,
   p_fingerprint TEXT,
   p_flagged BOOLEAN DEFAULT false,
   p_ip TEXT DEFAULT NULL
@@ -17,17 +16,22 @@ RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   UPDATE public.users
   SET device_fingerprint = p_fingerprint,
       flagged_duplicate = p_flagged,
       signup_ip = COALESCE(p_ip, signup_ip)
-  WHERE id = p_user_id;
+  WHERE id = v_user_id;
 END;
 $$;
 
--- Re-grant (signature changed with new p_ip param)
-GRANT EXECUTE ON FUNCTION public.save_user_fingerprint(UUID, TEXT, BOOLEAN, TEXT) TO authenticated;
+-- Re-grant (signature changed with new params)
+GRANT EXECUTE ON FUNCTION public.save_user_fingerprint(TEXT, BOOLEAN, TEXT) TO authenticated;
 
 -- 3. Suspicious accounts view (fingerprint dupes)
 CREATE OR REPLACE VIEW public.suspicious_accounts AS
@@ -67,6 +71,11 @@ DECLARE
   fp_dupes JSON;
   ip_clusters JSON;
 BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   -- Fingerprint duplicates
   SELECT COALESCE(json_agg(row_to_json(t)), '[]'::json)
   INTO fp_dupes

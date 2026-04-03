@@ -100,9 +100,7 @@ export const useDailyChallenge = () => {
     if (!user || state.isClaimed || !state.isComplete) return null;
 
     try {
-      const { data, error } = await supabase.rpc("complete_daily_challenge", {
-        p_user_id: user.id,
-      });
+      const { data, error } = await supabase.rpc("complete_daily_challenge");
 
       if (error || !data) return null;
 

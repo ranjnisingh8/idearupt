@@ -77,11 +77,9 @@ DECLARE
 BEGIN
   -- Verify admin access
   IF NOT EXISTS (
-    SELECT 1 FROM auth.users
-    WHERE auth.users.id = auth.uid()
-    AND auth.users.email IN ('garagefitness4@gmail.com')
+    SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'
   ) THEN
-    RAISE EXCEPTION 'Unauthorized: admin access required';
+    RAISE EXCEPTION 'Unauthorized';
   END IF;
 
   SELECT COALESCE(json_agg(row_to_json(t)), '[]'::json) INTO result

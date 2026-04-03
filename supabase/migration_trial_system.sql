@@ -48,14 +48,18 @@ WHERE trial_ends_at IS NULL
   AND subscription_status = 'free';
 
 -- ─── 4. RPC: Get user trial status (used by frontend) ────────
-CREATE OR REPLACE FUNCTION public.get_user_trial_status(p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.get_user_trial_status()
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
+  v_user_id UUID := auth.uid();
   result JSON;
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   SELECT json_build_object(
     'subscription_status', u.subscription_status,
     'trial_ends_at', u.trial_ends_at,
@@ -68,7 +72,7 @@ BEGIN
     'is_pro', u.subscription_status = 'pro'
   ) INTO result
   FROM public.users u
-  WHERE u.id = p_user_id;
+  WHERE u.id = v_user_id;
 
   RETURN COALESCE(result, json_build_object(
     'subscription_status', 'free',

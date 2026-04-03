@@ -88,9 +88,7 @@ DECLARE
 BEGIN
   -- Admin check
   IF NOT EXISTS (
-    SELECT 1 FROM auth.users
-    WHERE auth.users.id = auth.uid()
-    AND auth.users.email IN ('garagefitness4@gmail.com')
+    SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin'
   ) THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;

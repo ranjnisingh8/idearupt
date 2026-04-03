@@ -19,13 +19,17 @@ GRANT SELECT, INSERT, UPDATE ON TABLE public.usage_tracking TO authenticated;
 
 -- ─── STEP 2: ensure_user_row — called from AuthContext on every sign-in ───
 CREATE OR REPLACE FUNCTION ensure_user_row(
-  p_user_id UUID,
   p_email TEXT DEFAULT ''
 )
 RETURNS VOID AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
 BEGIN
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
   INSERT INTO public.users (id, email)
-  VALUES (p_user_id, p_email)
+  VALUES (v_user_id, p_email)
   ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -41,11 +45,21 @@ CREATE OR REPLACE FUNCTION save_builder_dna(
 )
 RETURNS JSONB AS $$
 DECLARE
-  v_user_id UUID;
+  v_user_id UUID := auth.uid();
+  v_req_count INT;
 BEGIN
-  v_user_id := auth.uid();
   IF v_user_id IS NULL THEN
     RETURN jsonb_build_object('error', 'Not authenticated');
+  END IF;
+  -- Rate limit: onboarding once per minute per user
+  SELECT COUNT(*) INTO v_req_count
+  FROM request_logs
+  WHERE user_id = v_user_id
+    AND action = 'save_builder_dna'
+    AND created_at > NOW() - INTERVAL '1 minute';
+
+  IF v_req_count > 3 THEN
+    RETURN jsonb_build_object('error', 'Rate limit exceeded');
   END IF;
 
   INSERT INTO public.builder_dna (user_id, tech_level, budget_range, time_commitment, industries, risk_tolerance)
@@ -66,6 +80,11 @@ BEGIN
     VALUES (v_user_id, TRUE)
     ON CONFLICT (id) DO UPDATE SET onboarding_completed = TRUE;
   END IF;
+
+  -- Log request and audit
+  INSERT INTO request_logs (user_id, action) VALUES (v_user_id, 'save_builder_dna');
+  INSERT INTO audit_logs (user_id, admin_id, action, metadata)
+  VALUES (v_user_id, v_user_id, 'save_builder_dna', jsonb_build_object('tech_level', p_tech_level, 'industries', p_industries));
 
   RETURN jsonb_build_object('success', true);
 END;

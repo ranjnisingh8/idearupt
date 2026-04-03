@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Wrap in Promise.resolve() because Supabase .rpc() returns a thenable, not a full Promise
       return Promise.resolve(
         supabase.rpc("ensure_user_row", {
-          p_user_id: currentUser.id,
           p_email: currentUser.email || "",
         })
       ).then(() => {
@@ -51,7 +50,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Save fingerprint + IP to user row
         Promise.resolve(supabase.rpc("save_user_fingerprint", {
-          p_user_id: currentUser.id,
           p_fingerprint: fp,
           p_flagged: flagged,
           p_ip: signupIp || null,
@@ -86,7 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const landingReferrer = getStoredLandingReferrer();
         if (refCode || utm?.source || landingReferrer) {
           Promise.resolve(supabase.rpc("save_user_signup_meta", {
-            p_user_id: currentUser.id,
             p_utm_source: utm?.source || null,
             p_utm_medium: utm?.medium || null,
             p_utm_campaign: utm?.campaign || null,

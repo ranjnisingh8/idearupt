@@ -51,7 +51,7 @@ $$;
 -- 3. RPC: Get user plan status (frontend fetches this on every app load)
 --    Auto-expires stale trial rows so the DB stays in sync with reality.
 -- ═══════════════════════════════════════════════════════════════
-CREATE OR REPLACE FUNCTION public.get_user_plan_status(p_user_id UUID)
+CREATE OR REPLACE FUNCTION public.get_user_plan_status()
 RETURNS JSON
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -59,24 +59,21 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   result          JSON;
+  v_user_id       UUID := auth.uid();
   v_plan_status   TEXT;
   v_trial_ends_at TIMESTAMPTZ;
   v_ls_sub_id     TEXT;
 BEGIN
-  -- Security: users can only query their own status
-  IF auth.uid() IS NULL OR auth.uid() != p_user_id THEN
-    RETURN json_build_object(
-      'plan_status', 'none',
-      'current_period_end', NULL,
-      'cancel_at_period_end', false
-    );
+  -- Security: must be authenticated
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'Unauthorized';
   END IF;
 
   -- Read current state so we can check for expired trial
   SELECT plan_status, trial_ends_at, ls_subscription_id
   INTO v_plan_status, v_trial_ends_at, v_ls_sub_id
   FROM public.users
-  WHERE id = p_user_id;
+  WHERE id = v_user_id;
 
   -- Auto-expire: trial past its end date and user never paid -> downgrade to free
   -- This fires on every app load, keeping the DB in sync without a cron job.
@@ -88,7 +85,7 @@ BEGIN
     UPDATE public.users
     SET plan_status         = 'free',
         subscription_status = 'free'
-    WHERE id = p_user_id;
+    WHERE id = v_user_id;
   END IF;
 
   -- Return the current (possibly just-updated) row
@@ -103,7 +100,7 @@ BEGIN
     'ls_customer_id',       u.ls_customer_id
   ) INTO result
   FROM public.users u
-  WHERE u.id = p_user_id;
+  WHERE u.id = v_user_id;
 
   RETURN COALESCE(result, json_build_object(
     'plan_status',          'none',
@@ -118,7 +115,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.get_user_plan_status(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_plan_status() TO authenticated;
 
 
 -- ═══════════════════════════════════════════════════════════════
